@@ -1,0 +1,43 @@
+1,2번 연결 후 포트 확인 방법
+새 터미널 
+source install/setup.bash 
+ros2 topic echo /limo_status <- 나오면 limo 정상 연결 (없으면 다른 포트로 연결 후 확인)
+ros2 topic echo /scan <- 나오면 lidar 정상 연결 (없으면 다른 포트로 연결 후 확인)
+
+1번 터미널 <- limo 드라이버 파일 실행
+cd ~/jin_ws
+source install/setup.bash #경로 지정
+ros2 launch limo_base limo_base.launch.py 
+
+2번 터미널 <- ydlidar 드라이버 실행 파일
+source install/setup.bash
+ros2 launch ydlidar_ros2_driver ydlidar_launch.py 
+
+3번 터미널 <- 카메라 드라이버 노드 실행
+ros2 run v4l2_camera v4l2_camera_node
+
+4번 터미널 <- 빨간색 선 인식 노드 실행
+cd ~/jin_ws/src/line_track/
+python3 red_node.py 
+
+5번 터미널 <- 노란색 선 인식 노드 실행
+cd ~/jin_ws/src/line_track/
+python3 yellow_node.py 
+
+6번 터미널 <- 아루코마커 인식 노드 실행
+cd jin_ws/src/line_track/
+python3 aruco_detect.py
+
+7번 터미널 <- lidar 장애물 감지 노드 실행
+cd jin_ws/src/line_track/
+python3 scan_node.py 
+
+8번 터미널 <- cmd_vel 종합 및 중개 노드 실행
+cd jin_ws/src/line_track/
+python3 arbiter2.py
+
+sudo ln -s /dev/ttyUSB0 /dev/ttylimo
+sudo rm -f /dev/ttylimo
+sudo ln -s /dev/ttyUSB1 /dev/ydlidar
+sudo rm -f /dev/ydlidar
+
